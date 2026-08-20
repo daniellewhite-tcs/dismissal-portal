@@ -795,11 +795,14 @@
         card.className = 'car-card ' + (isNowLoading ? 'now-loading ' : ' ') + (isFlagged ? 'red-flagged' : '');
 
         var studentsHTML = car.students.map(function(s) {
-          var flagText = s.redFlag ? ' <strong style="color:var(--danger)">[RED FLAG: ' + s.redFlag + ']</strong>' : '';
+          // ONLY display the red flag text if a flag value actually exists in the sheet
+          var flagText = (s.redFlag && s.redFlag.length > 0) 
+            ? ' <strong style="color:var(--danger)">[RED FLAG: ' + s.redFlag + ']</strong>' 
+            : '';
           
           return '<div class="student-entry-interactive" onclick="reportMissingStudent(\'' + s.name.replace(/'/g, "\\'") + '\', \'' + s.teacher.replace(/'/g, "\\'") + '\', \'' + car.number + '\')">' +
                  '<span>👤 <strong>' + s.name + '</strong> (Gr ' + s.grade + ' • ' + s.teacher + ')' + flagText + '</span>' +
-                 '<span style="font-size:0.75rem; background:#fee2e2; color:var(--danger); padding:2px 6px; border-radius:4px; font-weight:bold;">Flag Not Arrived</span>' +
+                 '<span style="font-size:0.75rem; background:#fee2e2; color:var(--danger); padding:2px 6px; border-radius:4px; font-weight:bold;">Report Missing</span>' +
                  '</div>';
         }).join('');
 
