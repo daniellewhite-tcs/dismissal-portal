@@ -1,2 +1,878 @@
-My Unblocked Web App
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --success: #15803d;
+      --danger: #dc2626;
+      --warning: #b45309;
+      --bg: #f8fafc;
+      --border: #cbd5e1;
+    }
 
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+      background: var(--bg); 
+      margin: 0; 
+      padding: 12px; 
+      color: #0f172a; 
+      padding-bottom: 30px;
+    }
+
+    header { 
+      background: var(--primary); 
+      color: white; 
+      padding: 12px 16px; 
+      border-radius: 10px; 
+      display: flex; 
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .header-title { font-size: 1.15rem; font-weight: bold; text-align: center; }
+
+    .nav-tabs {
+      display: flex;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 4px;
+      border-radius: 8px;
+      gap: 4px;
+    }
+
+    .nav-btn { 
+      flex: 1;
+      background: transparent; 
+      color: white; 
+      border: none; 
+      padding: 10px 6px; 
+      border-radius: 6px; 
+      cursor: pointer; 
+      font-weight: 600; 
+      font-size: 0.85rem;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+    .nav-btn.active { 
+      background: white; 
+      color: var(--primary); 
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .card { 
+      background: white; 
+      border: 1px solid var(--border); 
+      border-radius: 10px; 
+      padding: 14px; 
+      margin-bottom: 14px; 
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
+    }
+
+    .grid { display: flex; flex-direction: column; gap: 14px; }
+
+    .form-group { display: flex; flex-direction: column; gap: 10px; }
+    .input-row { display: flex; gap: 8px; }
+
+    input[type="text"], select { 
+      font-size: 16px !important; 
+      padding: 12px; 
+      border-radius: 8px; 
+      border: 1px solid var(--border); 
+      width: 100%;
+      background-color: #fff;
+    }
+
+    input[type="text"] { flex-grow: 1; }
+    select { width: 110px; flex-shrink: 0; }
+
+    button {
+      min-height: 48px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-submit { background: var(--primary); color: white; width: 100%; }
+    .btn-loaded { background: var(--success); color: white; padding: 8px 14px; min-height: 38px; font-size: 0.85rem; }
+    .btn-reset { background: #475569; color: white; width: 100%; margin-top: 8px; font-size: 0.9rem; }
+    .btn-reset:hover { background: #334155; }
+
+    /* Completion Broadcast Banner */
+    .completion-banner {
+      background: #1e3a8a;
+      color: white;
+      padding: 16px;
+      border-radius: 10px;
+      font-size: 1.25rem;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+      border: 3px solid #3b82f6;
+      animation: pulse 2s infinite alternate;
+    }
+
+    /* Missing Student Callout Banner */
+    .missing-alert-banner {
+      background: #fef2f2;
+      border: 2px solid var(--danger);
+      border-left: 8px solid var(--danger);
+      color: var(--danger);
+      padding: 14px;
+      border-radius: 8px;
+      margin-bottom: 14px;
+      font-weight: bold;
+      font-size: 1.1rem;
+      animation: blink 1s infinite alternate;
+    }
+
+    /* Tag Cards & Spot Pill Styling */
+    .car-card { 
+      background: #f1f5f9; 
+      border-left: 6px solid var(--primary); 
+      padding: 10px 12px; 
+      margin-bottom: 10px; 
+      border-radius: 8px; 
+      position: relative; 
+    }
+    .car-card.now-loading { 
+      background: #f0fdf4; 
+      border-left-color: var(--success); 
+    }
+    
+    .car-card.red-flagged {
+      background: #fef2f2 !important;
+      border-left: 8px solid var(--danger) !important;
+      border: 2px solid var(--danger) !important;
+      animation: blink 1s infinite alternate;
+    }
+
+    .car-header { 
+      font-size: 1.05rem; 
+      font-weight: 800; 
+      color: var(--primary); 
+      margin-bottom: 6px; 
+      display: flex; 
+      align-items: center; 
+      gap: 8px; 
+    }
+    .red-flagged .car-header { color: var(--danger) !important; }
+    
+    .spot-badge {
+      background: var(--primary);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+    .now-loading .spot-badge { background: var(--success); }
+    .red-flagged .spot-badge { background: var(--danger) !important; }
+
+    /* Interactive Student Entry for Gatekeeper */
+    .student-entry-interactive { 
+      padding: 8px; 
+      margin: 4px 0;
+      border-radius: 6px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      font-size: 0.95rem; 
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.15s ease;
+    }
+    .student-entry-interactive:hover { background: #fee2e2; border-color: var(--danger); }
+
+    .student-entry { padding: 4px 0; border-bottom: 1px dashed #cbd5e1; font-size: 0.95rem; }
+    .student-entry:last-child { border-bottom: none; }
+
+    .alert-warning {
+      background: #fef3c7;
+      color: var(--warning);
+      border: 1px solid #f59e0b;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      font-weight: bold;
+      font-size: 0.95rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .recent-dispatch-item {
+      background: #f1f5f9;
+      border-left: 4px solid var(--primary);
+      padding: 8px 10px;
+      margin-bottom: 6px;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .highlight { border: 3px solid var(--success) !important; animation: pulse 1s infinite alternate; }
+
+    .audio-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #e0f2fe;
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin-top: 8px;
+    }
+
+    .spinner-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(3px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      color: white;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 5px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: #ffffff;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 12px;
+    }
+
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes pulse { 0% { transform: scale(1); } 100% { transform: scale(1.02); } }
+    @keyframes blink { 0% { opacity: 1; } 100% { opacity: 0.75; } }
+
+    @media (min-width: 640px) {
+      header { flex-direction: row; }
+      .header-title { text-align: left; }
+      .nav-tabs { width: auto; }
+      .nav-btn { flex: initial; padding: 8px 16px; }
+      .grid { display: grid; grid-template-columns: 1fr 1fr; }
+      .form-group { flex-direction: row; }
+      .btn-submit { width: auto; }
+      .btn-reset { width: auto; margin-top: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SPINNER OVERLAY -->
+  <div id="loadingOverlay" class="spinner-overlay" style="display:none;">
+    <div class="spinner"></div>
+    <div id="spinnerText">Processing...</div>
+  </div>
+
+  <header>
+    <div class="header-title">NES Car Rider Portal</div>
+    <div class="nav-tabs">
+      <button class="nav-btn active" onclick="showPanel('scanner', this)">Scanner</button>
+      <button class="nav-btn" onclick="showPanel('gatekeeper', this)">Gatekeeper</button>
+      <button class="nav-btn" onclick="showPanel('classroom', this)">Classroom</button>
+    </div>
+  </header>
+
+  <!-- VIEW 1: SCANNER VIEW (MOBILE ENTRY) -->
+  <div id="scanner" class="panel active">
+    
+    <div id="duplicateAlert" class="alert-warning" style="display:none;">
+      <span id="duplicateMessage"></span>
+      <button style="background:none; border:none; color:var(--warning); font-weight:bold; cursor:pointer;" onclick="hideDuplicateAlert()">✕</button>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0; margin-bottom:10px; color:var(--primary);">Tag Entry Scanner</h3>
+      <form class="form-group" onsubmit="event.preventDefault(); submitCar();">
+        <div class="input-row">
+          <input type="text" id="carInput" placeholder="Tag #(s) e.g. 12, 45" inputmode="numeric" required autofocus>
+          <select id="laneInput">
+            <option value="1">Lane 1</option>
+            <option value="2">Lane 2</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-submit">Dispatch Tag</button>
+      </form>
+    </div>
+
+    <div class="card" id="scannerFeedCard" style="display:none;">
+      <h4 style="margin-top:0; margin-bottom:8px; color:var(--primary);">Recent Dispatches</h4>
+      <div id="recentDispatchesList"></div>
+    </div>
+  </div>
+
+  <!-- VIEW 2: GATEKEEPER VIEW -->
+  <div id="gatekeeper" class="panel">
+    <div class="card" style="display:flex; flex-direction:column; gap:8px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <h3 style="margin:0; color:var(--primary);">Gatekeeper Queue Control</h3>
+        <button type="button" onclick="clearMissingAlerts()" style="background:#e2e8f0; color:#0f172a; min-height:36px; padding:4px 10px; font-size:0.8rem;">Clear Missing Student Alerts</button>
+      </div>
+      <p style="font-size:0.85rem; color:#64748b; margin:0;">💡 <em>Tap any student name below to alert their teacher that the student is missing from the car line.</em></p>
+      <button class="btn-reset" onclick="confirmResetQueue()">🛑 End Car Riders (Reset for Tomorrow)</button>
+    </div>
+
+    <div class="grid">
+      <!-- 1. NOW LOADING: LANE 1 -->
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <h3 style="margin:0; color:var(--success);">Lane 1 — Now Loading</h3>
+          <button class="btn-loaded" onclick="advanceLane(1)">Lane 1 Loaded</button>
+        </div>
+        <hr style="border:none; border-top:1px solid var(--border); margin-bottom:10px;">
+        <div id="l1Loading"></div>
+      </div>
+
+      <!-- 2. NOW LOADING: LANE 2 -->
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <h3 style="margin:0; color:var(--success);">Lane 2 — Now Loading</h3>
+          <button class="btn-loaded" onclick="advanceLane(2)">Lane 2 Loaded</button>
+        </div>
+        <hr style="border:none; border-top:1px solid var(--border); margin-bottom:10px;">
+        <div id="l2Loading"></div>
+      </div>
+
+      <!-- 3. UP NEXT: LANE 1 -->
+      <div class="card">
+        <h3 style="margin:0 0 8px 0; color:var(--primary);">Lane 1 — Up Next</h3>
+        <hr style="border:none; border-top:1px solid var(--border); margin-bottom:10px;">
+        <div id="l1Next"></div>
+      </div>
+
+      <!-- 4. UP NEXT: LANE 2 -->
+      <div class="card">
+        <h3 style="margin:0 0 8px 0; color:var(--primary);">Lane 2 — Up Next</h3>
+        <hr style="border:none; border-top:1px solid var(--border); margin-bottom:10px;">
+        <div id="l2Next"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW 3: CLASSROOM DISPLAY PANEL -->
+  <div id="classroom" class="panel">
+    
+    <!-- BROADCAST: Dismissal Complete -->
+    <div id="completionBanner" class="completion-banner" style="display:none;">
+      📢 Car Riders is Complete. Send all remaining students to the office.
+    </div>
+
+    <!-- BROADCAST: Missing Student Warning -->
+    <div id="missingStudentAlertsContainer"></div>
+
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <label><strong>Select Teacher: </strong></label>
+        <button id="resumeDismissalBtn" style="display:none; background:#0284c7; color:white; min-height:30px; font-size:0.75rem; padding:2px 8px;" onclick="resumeDismissal()">Start New Dismissal</button>
+      </div>
+      <select id="teacherSelect" style="width:100%; margin-top:6px;" onchange="updateUI(cachedQueue)">
+        <option value="ALL">-- All Classrooms --</option>
+      </select>
+
+      <div class="audio-toggle">
+        <label style="cursor:pointer; font-weight:bold; font-size:0.9rem;">
+          <input type="checkbox" id="audioEnabled" onchange="enableAudioContext()"> 🔔 Sound Alerts
+        </label>
+        <button type="button" onclick="playNotificationChime()" style="font-size:0.8rem; min-height:30px; padding:2px 8px;">Test Sound</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2 style="color:var(--success); margin-top:0; font-size:1.2rem;">NOW LOADING</h2>
+        <div id="classLoading"></div>
+      </div>
+      <div class="card">
+        <h2 style="color:var(--primary); margin-top:0; font-size:1.2rem;">UP NEXT</h2>
+        <div id="classNext"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Live Deployment API Endpoint
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwHF9hEkYQQKK_JKeCarB1sPd8v6KDOKnT3xh8PN5V_i7MqqTprlTevXNsP-oPsUhfX/exec";
+
+    /**
+     * Helper function replacing google.script.run
+     */
+    async function callAppsScript(actionName, payload = {}) {
+      try {
+        const response = await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8",
+          },
+          body: JSON.stringify({
+            action: actionName,
+            data: payload
+          })
+        });
+
+        const result = await response.json();
+        
+        if (result.status === "error") {
+          throw new Error(result.message);
+        }
+
+        return result.data;
+      } catch (error) {
+        console.error("API Call Failed:", error);
+        throw error;
+      }
+    }
+
+    var cachedQueue = { lane1: [], lane2: [], isComplete: false, missingStudents: [] };
+    var previousTeacherRiders = [];
+    var previousMissingCount = 0;
+    var recentDispatches = [];
+    var CAR_BATCH_SIZE = 6;
+    var audioCtx = null;
+
+    function showSpinner(text) {
+      document.getElementById('spinnerText').textContent = text || 'Processing...';
+      document.getElementById('loadingOverlay').style.display = 'flex';
+    }
+
+    function hideSpinner() {
+      document.getElementById('loadingOverlay').style.display = 'none';
+    }
+
+    function showDuplicateAlert(message) {
+      document.getElementById('duplicateMessage').textContent = message;
+      document.getElementById('duplicateAlert').style.display = 'flex';
+    }
+
+    function hideDuplicateAlert() {
+      document.getElementById('duplicateAlert').style.display = 'none';
+    }
+
+    function enableAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playNotificationChime() {
+      enableAudioContext();
+      if (!audioCtx) return;
+
+      var now = audioCtx.currentTime;
+      var osc1 = audioCtx.createOscillator();
+      var osc2 = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
+
+      osc1.type = 'sine';
+      osc2.type = 'sine';
+
+      osc1.frequency.setValueAtTime(783.99, now);
+      osc2.frequency.setValueAtTime(1046.50, now + 0.15);
+
+      gain.gain.setValueAtTime(0.3, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+
+      osc1.connect(gain);
+      osc2.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc1.start(now);
+      osc1.stop(now + 0.15);
+      osc2.start(now + 0.15);
+      osc2.stop(now + 0.6);
+    }
+
+    function playUrgentAlertTone() {
+      enableAudioContext();
+      if (!audioCtx) return;
+
+      var now = audioCtx.currentTime;
+      var osc = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(440, now);
+      osc.frequency.setValueAtTime(880, now + 0.1);
+      osc.frequency.setValueAtTime(440, now + 0.2);
+
+      gain.gain.setValueAtTime(0.4, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.4);
+    }
+
+    function showPanel(id, btn) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      btn.classList.add('active');
+    }
+
+    async function submitCar() {
+      var carNum = document.getElementById('carInput').value;
+      var lane = document.getElementById('laneInput').value;
+      document.getElementById('carInput').value = '';
+      document.getElementById('carInput').focus();
+
+      showSpinner('Dispatching Tag #' + carNum + '...');
+
+      try {
+        const res = await callAppsScript('addCarToQueue', { carNum: carNum, lane: lane });
+        hideSpinner();
+        
+        if (res.duplicates && res.duplicates.length > 0) {
+          showDuplicateAlert('⚠️ Tag(s) #' + res.duplicates.join(', #') + ' are already in the queue!');
+        } else {
+          hideDuplicateAlert();
+        }
+
+        if (res.addedCount > 0) {
+          var timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          var isFlagged = false;
+          var flagNotes = [];
+
+          if (res.queue) {
+            var allCars = [...res.queue.lane1, ...res.queue.lane2];
+            var tagNums = String(carNum).split(/[\s,+]+/).filter(Boolean);
+            tagNums.forEach(function(tn) {
+              var found = allCars.find(c => c.number === tn.trim());
+              if (found) {
+                found.students.forEach(function(s) {
+                  if (s.redFlag && s.redFlag.length > 0) {
+                    isFlagged = true;
+                    flagNotes.push(s.name + ': ' + s.redFlag);
+                  }
+                });
+              }
+            });
+          }
+
+          recentDispatches.unshift({ 
+            tag: carNum, 
+            lane: lane, 
+            time: timeStr, 
+            redFlagged: isFlagged,
+            flagText: flagNotes.join(' | ')
+          });
+
+          if (recentDispatches.length > 5) recentDispatches.pop();
+          renderRecentDispatches();
+        }
+
+        updateUI(res.queue);
+      } catch (err) {
+        hideSpinner();
+        alert('Error dispatching tag: ' + err.message);
+      }
+    }
+
+    function renderRecentDispatches() {
+      var feedCard = document.getElementById('scannerFeedCard');
+      var list = document.getElementById('recentDispatchesList');
+      if (recentDispatches.length === 0) {
+        feedCard.style.display = 'none';
+        return;
+      }
+      feedCard.style.display = 'block';
+      list.innerHTML = recentDispatches.map(function(item) {
+        var style = item.redFlagged 
+          ? 'background:#fef2f2; border-left:4px solid var(--danger); color:var(--danger); font-weight:bold;' 
+          : '';
+        
+        var flagNotice = item.redFlagged 
+          ? '<div style="margin-top:4px; font-weight:bold; color:var(--danger);">🚨 RED FLAG: ' + item.flagText + '</div>' 
+          : '';
+
+        return '<div class="recent-dispatch-item" style="' + style + '"><div>✅ Dispatched <strong>Tag #' + item.tag + '</strong> to Lane ' + item.lane + flagNotice + '</div><small style="color:#64748b;">' + item.time + '</small></div>';
+      }).join('');
+    }
+
+    async function advanceLane(lane) {
+      showSpinner('Advancing Lane ' + lane + '...');
+
+      try {
+        const queue = await callAppsScript('advanceLaneQueue', { lane: lane, carBatchSize: CAR_BATCH_SIZE });
+        hideSpinner();
+        hideDuplicateAlert();
+        updateUI(queue);
+      } catch (err) {
+        hideSpinner();
+        alert('Error advancing lane: ' + err.message);
+      }
+    }
+
+    async function reportMissingStudent(studentName, teacher, tagNum) {
+      if (confirm('Alert Teacher ' + teacher + ' that ' + studentName + ' has not arrived at Car Riders?')) {
+        showSpinner('Notifying Classroom...');
+        try {
+          const queue = await callAppsScript('flagMissingStudent', { studentName: studentName, teacher: teacher, tagNum: tagNum });
+          hideSpinner();
+          updateUI(queue);
+        } catch (err) {
+          hideSpinner();
+          alert('Error reporting missing student: ' + err.message);
+        }
+      }
+    }
+
+    async function clearMissingAlerts() {
+      showSpinner('Clearing missing student alerts...');
+      try {
+        const queue = await callAppsScript('clearMissingStudents');
+        hideSpinner();
+        updateUI(queue);
+      } catch (err) {
+        hideSpinner();
+        alert('Error clearing alerts: ' + err.message);
+      }
+    }
+
+    async function confirmResetQueue() {
+      if (confirm('Are you sure you want to end car rider dismissal and reset the queue for tomorrow?')) {
+        showSpinner('Resetting Queue for Tomorrow...');
+        try {
+          const queue = await callAppsScript('resetQueue');
+          hideSpinner();
+          hideDuplicateAlert();
+          recentDispatches = [];
+          renderRecentDispatches();
+          updateUI(queue);
+        } catch (err) {
+          hideSpinner();
+          alert('Error resetting queue: ' + err.message);
+        }
+      }
+    }
+
+    async function resumeDismissal() {
+      try {
+        const queue = await callAppsScript('startNewDismissal');
+        updateUI(queue);
+      } catch (err) {
+        console.error("Error resuming dismissal:", err);
+      }
+    }
+
+    async function pollQueue() {
+      try {
+        const queue = await callAppsScript('getActiveQueue');
+        updateUI(queue);
+      } catch (err) {
+        console.error("Polling error:", err);
+      }
+    }
+
+    function updateUI(queue) {
+      if (!queue) return;
+      cachedQueue = queue;
+      
+      // Handle Completion Broadcast Banner
+      var completionBanner = document.getElementById('completionBanner');
+      var resumeBtn = document.getElementById('resumeDismissalBtn');
+      if (queue.isComplete) {
+        completionBanner.style.display = 'block';
+        resumeBtn.style.display = 'inline-block';
+      } else {
+        completionBanner.style.display = 'none';
+        resumeBtn.style.display = 'none';
+      }
+
+      // Prepare Lane Arrays with Spot Numbers (1 through 6)
+      var l1Loading = (queue.lane1 || []).slice(0, CAR_BATCH_SIZE).map((c, i) => ({ ...c, spotNum: i + 1 }));
+      var l1Next    = (queue.lane1 || []).slice(CAR_BATCH_SIZE, CAR_BATCH_SIZE * 2).map((c, i) => ({ ...c, spotNum: i + 1 }));
+
+      var l2Loading = (queue.lane2 || []).slice(0, CAR_BATCH_SIZE).map((c, i) => ({ ...c, spotNum: i + 1 }));
+      var l2Next    = (queue.lane2 || []).slice(CAR_BATCH_SIZE, CAR_BATCH_SIZE * 2).map((c, i) => ({ ...c, spotNum: i + 1 }));
+
+      // Render Gatekeeper UI with interactive missing student triggers
+      renderGatekeeperCarList(l1Loading, 'l1Loading', true);
+      renderGatekeeperCarList(l1Next, 'l1Next', false);
+      renderGatekeeperCarList(l2Loading, 'l2Loading', true);
+      renderGatekeeperCarList(l2Next, 'l2Next', false);
+
+      // Handle Classroom Missing Student Callouts
+      var teacher = document.getElementById('teacherSelect').value;
+      var missingContainer = document.getElementById('missingStudentAlertsContainer');
+      missingContainer.innerHTML = '';
+
+      if (queue.missingStudents && queue.missingStudents.length > 0) {
+        var relevantMissing = teacher === 'ALL' 
+          ? queue.missingStudents 
+          : queue.missingStudents.filter(m => m.teacher === teacher);
+
+        if (relevantMissing.length > 0) {
+          relevantMissing.forEach(function(m) {
+            var alertDiv = document.createElement('div');
+            alertDiv.className = 'missing-alert-banner';
+            alertDiv.innerHTML = '🚨 <strong>STUDENT NOT ARRIVED:</strong> ' + m.name + ' (Teacher: ' + m.teacher + ') — Tag #' + m.tag + ' is waiting in car line!';
+            missingContainer.appendChild(alertDiv);
+          });
+
+          if (relevantMissing.length > previousMissingCount && document.getElementById('audioEnabled').checked) {
+            playUrgentAlertTone();
+          }
+        }
+        previousMissingCount = relevantMissing.length;
+      } else {
+        previousMissingCount = 0;
+      }
+
+      // Classroom UI Rendering: SHOW ONLY SELECTED TEACHER'S STUDENTS
+      var nowLoadingAllCars = [...l1Loading, ...l2Loading];
+      var upNextAllCars     = [...l1Next, ...l2Next];
+
+      if (teacher !== 'ALL') {
+        var currentTeacherRiders = [];
+        nowLoadingAllCars.forEach(function(car) {
+          car.students.forEach(function(s) {
+            if (s.teacher === teacher) {
+              currentTeacherRiders.push(car.number + '-' + s.name);
+            }
+          });
+        });
+
+        var hasNewRider = currentTeacherRiders.some(id => !previousTeacherRiders.includes(id));
+        
+        if (hasNewRider && document.getElementById('audioEnabled').checked) {
+          playNotificationChime();
+        }
+        previousTeacherRiders = currentTeacherRiders;
+      }
+
+      renderClassroomCarList(nowLoadingAllCars, 'classLoading', teacher, true);
+      renderClassroomCarList(upNextAllCars, 'classNext', teacher, false);
+    }
+
+    // Gatekeeper View: Tap student name to flag as missing
+    function renderGatekeeperCarList(cars, elementId, isNowLoading) {
+      var container = document.getElementById(elementId);
+      container.innerHTML = '';
+
+      if (cars.length === 0) {
+        container.innerHTML = '<p style="color:#94a3b8; font-size:0.85rem; font-style:italic; margin:4px 0;">No tags queued</p>';
+        return;
+      }
+
+      cars.forEach(function(car) {
+        var card = document.createElement('div');
+        var isFlagged = car.students.some(s => s.redFlag && s.redFlag.length > 0);
+        
+        card.className = 'car-card ' + (isNowLoading ? 'now-loading ' : ' ') + (isFlagged ? 'red-flagged' : '');
+
+        var studentsHTML = car.students.map(function(s) {
+          var flagText = s.redFlag ? ' <strong style="color:var(--danger)">[RED FLAG: ' + s.redFlag + ']</strong>' : '';
+          
+          return '<div class="student-entry-interactive" onclick="reportMissingStudent(\'' + s.name.replace(/'/g, "\\'") + '\', \'' + s.teacher.replace(/'/g, "\\'") + '\', \'' + car.number + '\')">' +
+                 '<span>👤 <strong>' + s.name + '</strong> (Gr ' + s.grade + ' • ' + s.teacher + ')' + flagText + '</span>' +
+                 '<span style="font-size:0.75rem; background:#fee2e2; color:var(--danger); padding:2px 6px; border-radius:4px; font-weight:bold;">Flag Not Arrived</span>' +
+                 '</div>';
+        }).join('');
+
+        card.innerHTML = '<div class="car-header"><span class="spot-badge">Spot #' + car.spotNum + '</span> Tag #' + car.number + ' (Lane ' + car.lane + ')</div>' + studentsHTML;
+        container.appendChild(card);
+      });
+    }
+
+    // Classroom View: Filters to ONLY show the selected teacher's students
+    function renderClassroomCarList(cars, elementId, selectedTeacher, isNowLoading) {
+      var container = document.getElementById(elementId);
+      container.innerHTML = '';
+
+      var displayCars = [];
+
+      cars.forEach(function(car) {
+        var matchingStudents = car.students;
+        if (selectedTeacher !== 'ALL') {
+          matchingStudents = car.students.filter(function(s) {
+            return s.teacher === selectedTeacher;
+          });
+        }
+
+        if (matchingStudents.length > 0) {
+          displayCars.push({
+            number: car.number,
+            lane: car.lane,
+            spotNum: car.spotNum,
+            students: matchingStudents
+          });
+        }
+      });
+
+      if (displayCars.length === 0) {
+        container.innerHTML = '<p style="color:#94a3b8; font-size:0.9rem; margin:4px 0;">No students in queue</p>';
+        return;
+      }
+
+      displayCars.forEach(function(car) {
+        var card = document.createElement('div');
+        var isHighlighted = selectedTeacher !== 'ALL';
+
+        card.className = 'car-card ' + (isNowLoading ? 'now-loading ' : ' ') + (isHighlighted ? 'highlight ' : ' ');
+
+        var studentsHTML = car.students.map(function(s) {
+          return '<div class="student-entry" style="font-weight:bold; color:var(--success); font-size:1.05rem;">👤 <strong>' + s.name + '</strong> — Gr ' + s.grade + ' (' + s.teacher + ')</div>';
+        }).join('');
+
+        card.innerHTML = '<div class="car-header"><span class="spot-badge">Spot #' + car.spotNum + '</span> Tag #' + car.number + ' — Lane ' + car.lane + '</div>' + studentsHTML;
+        container.appendChild(card);
+      });
+    }
+
+    // Populate Teacher Dropdown
+    callAppsScript('getRoster')
+      .then(function(roster) {
+        if (!roster) return;
+        var teachers = [...new Set(roster.map(r => r.teacher))].sort();
+        var select = document.getElementById('teacherSelect');
+        teachers.forEach(function(t) {
+          var opt = document.createElement('option');
+          opt.value = t;
+          opt.textContent = "Teacher: " + t;
+          select.appendChild(opt);
+        });
+      })
+      .catch(function(err) {
+        console.error("Failed to load roster:", err);
+      });
+
+    // Poll every 2 seconds
+    setInterval(pollQueue, 2000);
+    pollQueue();
+  </script>
+</body>
+</html>
